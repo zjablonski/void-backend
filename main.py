@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request, redirect, session
 import os
 from test_transcription import transcribe_audio_from_base64
+from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
 
+load_dotenv()
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+db = SQLAlchemy(app)
 
 @app.route('/')
 def hello_world():  # put application's code here
