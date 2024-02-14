@@ -11,7 +11,7 @@ db = SQLAlchemy(app)
 
 @app.route('/')
 def hello_world():  # put application's code here
-    return 'Hello World!'
+    return 'Hello World'
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe_audio():  # put application's code here
