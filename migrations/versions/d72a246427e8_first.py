@@ -1,8 +1,8 @@
-"""first migration
+"""first
 
-Revision ID: fad542e97d13
+Revision ID: d72a246427e8
 Revises: 
-Create Date: 2024-02-13 13:06:34.520290
+Create Date: 2024-02-14 13:58:50.952267
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'fad542e97d13'
+revision: str = 'd72a246427e8'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,10 +23,28 @@ def upgrade() -> None:
     op.create_table('things',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=200), nullable=True),
-    sa.Column('note', sa.String(length=200), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('category', sa.String(length=200), nullable=True),
+    sa.Column('unit', sa.String(length=64), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
+    )
+    op.create_table('thoughts',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('text', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('text')
+    )
+    op.create_table('events',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('amount', sa.String(length=64), nullable=True),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('raw_text', sa.Text(), nullable=True),
+    sa.Column('occurred_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('thing_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['thing_id'], ['things.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.drop_table('thing')
     # ### end Alembic commands ###
@@ -40,5 +58,7 @@ def downgrade() -> None:
     sa.PrimaryKeyConstraint('id', name='thing_pkey'),
     sa.UniqueConstraint('username', name='thing_username_key')
     )
+    op.drop_table('events')
+    op.drop_table('thoughts')
     op.drop_table('things')
     # ### end Alembic commands ###

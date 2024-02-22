@@ -1,9 +1,11 @@
 import base64
+import os
+import uuid
+
 import whisper
 from pydub import AudioSegment
 import base64
 import io
-
 
 
 def decode_base64_to_audio(base64_audio, format='mp4'):
@@ -14,9 +16,11 @@ def decode_base64_to_audio(base64_audio, format='mp4'):
 
 def transcribe_audio_from_base64(audio_list):
     combined_audio = sum([decode_base64_to_audio(audio) for audio in audio_list])
-    combined_audio.export("output.m4a", format='mp4')
-    model = whisper.load_model("base")
-    result = model.transcribe("output.m4a", fp16=False)
+    filename = f"{str(uuid.uuid4())}.m4a"
+    combined_audio.export(filename, format='mp4')
+    model = whisper.load_model("large-v2")
+    result = model.transcribe(filename, fp16=False)
+    os.remove(filename)
     return result["text"]
 
 
