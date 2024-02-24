@@ -27,3 +27,4 @@ This is a [Flask](https://flask.palletsprojects.com/en/1.1.x/) app that serves a
 - Run Migrations `alembic upgrade head`
 - Create migration `alembic revision --autogenerate -m "message"`
 - Run ngrok (port forwarding for webhooks) `ngrok http --domain=flexible-cheaply-jay.ngrok-free.app 5003`
+- Run celery (for async tasks) `celery -A main.celery worker --loglevel=info`
