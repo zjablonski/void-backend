@@ -4,4 +4,4 @@
 gunicorn main:app &
 
 # Start the Celery worker
-celery -A yourapp.celery worker --loglevel=info
+celery -A main.celery worker --loglevel=info
