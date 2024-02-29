@@ -10,7 +10,7 @@ thing_bp = Blueprint('thing_bp', __name__)
 
 
 # Create
-@thing_bp.route('/thing', methods=['POST'])
+@thing_bp.route('/', methods=['POST'])
 def create_thing():
     thing = ThingSchema().load(request.json)
     db.session.add(thing)
@@ -19,21 +19,21 @@ def create_thing():
 
 
 # Read - single item
-@thing_bp.route('/thing/<int:thing_id>', methods=['GET'])
+@thing_bp.route('/<int:thing_id>', methods=['GET'])
 def get_thing(thing_id):
     thing = Thing.query.get_or_404(thing_id)
     return ThingSchema().dump(thing)
 
 
 # Read - all items
-@thing_bp.route('/things', methods=['GET'])
+@thing_bp.route('/', methods=['GET'])
 def get_things():
     all_things = Thing.query.all()
     return ThingSchema(many=True).dump(all_things)
 
 
 # Update
-@thing_bp.route('/thing/<int:thing_id>', methods=['PUT'])
+@thing_bp.route('/<int:thing_id>', methods=['PUT'])
 def update_thing(thing_id):
     thing = Thing.query.get_or_404(thing_id)
     thing = ThingSchema().load(request.json, instance=thing)
@@ -42,7 +42,7 @@ def update_thing(thing_id):
 
 
 # Delete
-@thing_bp.route('/thing/<int:thing_id>', methods=['DELETE'])
+@thing_bp.route('/<int:thing_id>', methods=['DELETE'])
 def delete_thing(thing_id):
     thing = Thing.query.get_or_404(thing_id)
     db.session.delete(thing)

@@ -1,5 +1,5 @@
 from utils.extensions import ma
-from models import Thing, Event, Thoughts, Transcription
+from models import Thing, Event, Thought, AudioLog
 
 
 class ThingSchema(ma.SQLAlchemyAutoSchema):
@@ -16,11 +16,11 @@ class EventSchema(ma.SQLAlchemyAutoSchema):
 
 class ThoughtsSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Thoughts
+        model = Thought
         load_instance = True  # Optional: deserialize to model instances
 
 
-class TranscriptionSchema(ma.SQLAlchemyAutoSchema):
+class AudioLogSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Transcription
+        model = AudioLog
         load_instance = True  # Optional: deserialize to model instances

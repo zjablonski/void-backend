@@ -17,19 +17,27 @@ class Category(ExtendedEnum):
     Mood = 'Mood'
 
 
-class Transcription(db.Model):
-    __tablename__ = 'transcriptions'
+class AudioLog(db.Model):
+    __tablename__ = 'audio_logs'
     id = Column(Integer, primary_key=True)
     assemblyai_id = Column(Text)
 
     status = Column(String(64))
-    text = Column(Text)
     file_name = Column(Text)
+    text = Column(Text)
 
-    shallow_analysis = Column(JSON)
-    deep_analysis = Column(JSON)
+    # Data generated from LLMs
+    identified_things = Column(JSON)
+    raw_events = Column(JSON)
+    raw_thoughts = Column(JSON)
+    raw_shallow_analysis = Column(JSON)
+    raw_deep_analysis = Column(JSON)
+    system_notes = Column(Text, default="")  # used to store issues w/ processing
 
     created_at = Column(DateTime, default=func.now())
+
+    events = relationship('Event', back_populates='audio_log')
+    thoughts = relationship('Thought', back_populates='audio_log')
 
 
 class Thing(db.Model):
@@ -50,22 +58,28 @@ class Event(db.Model):
     __tablename__ = 'events'
     id = Column(Integer, primary_key=True)
     amount = Column(String(64))
-    notes = Column(Text)
-    raw_text = Column(Text)
+    note = Column(Text)
 
     occurred_at = Column(DateTime, default=func.now())
     created_at = Column(DateTime, default=func.now())
 
-    thing_id = Column(Integer, ForeignKey('things.id'))
+    audio_log = relationship('AudioLog', back_populates='events')
+    audio_log_id = Column(Integer, ForeignKey('audio_logs.id'))
+
     thing = relationship('Thing', back_populates='events')
+    thing_id = Column(Integer, ForeignKey('things.id'))
 
 
-class Thoughts(db.Model):
+class Thought(db.Model):
     __tablename__ = "thoughts"
 
     id = Column(Integer, primary_key=True)
-    text = Column(Text, unique=True)
+    text = Column(Text)
+
     created_at = Column(DateTime, default=func.now())
+
+    audio_log = relationship('AudioLog', back_populates='thoughts')
+    audio_log_id = Column(Integer, ForeignKey('audio_logs.id'))
 
     def __repr__(self):
         return f"id: {self.id}, text: {self.text}"
