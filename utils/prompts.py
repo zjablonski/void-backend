@@ -49,6 +49,8 @@ If you want to suggest a new Thing, add it to the output with `suggested_thing_n
 
 When suggesting new Things, be generic where possible. For example, if the user says they walked and ran, a Thing that captures both under "Distance Walked/Run" would be appropriate.
 
+If you suggest a new thing, leave thing_id as null. If the Thing already exists, set thing_id to the ID of the Thing.
+
 Only incorporate data that comes directly from the user. Use the exact words from the user when adding notes to Events or Thoughts."""
 
 

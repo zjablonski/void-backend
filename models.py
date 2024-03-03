@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, String, Integer, func, Text, ForeignKey, JSON
+from sqlalchemy import Column, DateTime, String, Integer, func, Text, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
 from enum import Enum
 from utils.extensions import db
@@ -17,27 +17,40 @@ class Category(ExtendedEnum):
     Mood = 'Mood'
 
 
+class ThingStatus(ExtendedEnum):
+    SUGGESTED = 'SUGGESTED'
+    APPROVED = 'APPROVED'
+    REJECTED = 'REJECTED'
+
+
+class AudioLogStatus(ExtendedEnum):
+    PENDING_APPROVAL = 'PENDING_APPROVAL'
+    APPROVED = 'APPROVED'
+    REJECTED = 'REJECTED'
+
+
 class AudioLog(db.Model):
     __tablename__ = 'audio_logs'
     id = Column(Integer, primary_key=True)
     assemblyai_id = Column(Text)
 
-    status = Column(String(64))
+    status = Column(String(64), default=AudioLogStatus.PENDING_APPROVAL.value)
     file_name = Column(Text)
     text = Column(Text)
 
+    is_processing_complete = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+
     # Data generated from LLMs
     identified_things = Column(JSON)
-    raw_events = Column(JSON)
-    raw_thoughts = Column(JSON)
     raw_shallow_analysis = Column(JSON)
     raw_deep_analysis = Column(JSON)
     system_notes = Column(Text, default="")  # used to store issues w/ processing
 
-    created_at = Column(DateTime, default=func.now())
-
-    events = relationship('Event', back_populates='audio_log')
-    thoughts = relationship('Thought', back_populates='audio_log')
+    events = relationship('Event', back_populates='audio_log', cascade="all, delete-orphan")
+    thoughts = relationship('Thought', back_populates='audio_log', cascade="all, delete-orphan")
 
 
 class Thing(db.Model):
@@ -47,6 +60,8 @@ class Thing(db.Model):
     name = Column(String(200), unique=True)
     category = Column(String(200))
     unit = Column(String(64), nullable=True)
+
+    status = Column(String, default=ThingStatus.SUGGESTED.value)
 
     events = relationship('Event', back_populates='thing')
 
@@ -59,6 +74,7 @@ class Event(db.Model):
     id = Column(Integer, primary_key=True)
     amount = Column(String(64))
     note = Column(Text)
+    is_active = Column(Boolean, default=False)  # inactive until confirmed by user
 
     occurred_at = Column(DateTime, default=func.now())
     created_at = Column(DateTime, default=func.now())
@@ -75,6 +91,7 @@ class Thought(db.Model):
 
     id = Column(Integer, primary_key=True)
     text = Column(Text)
+    is_active = Column(Boolean, default=False) # inactive until confirmed by user
 
     created_at = Column(DateTime, default=func.now())
 
