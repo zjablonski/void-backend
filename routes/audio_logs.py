@@ -1,8 +1,10 @@
+from datetime import timedelta
+
 from flask import Blueprint, jsonify, request, g
 import assemblyai as aai
 import os
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
 
 from utils.s3_utils import generate_presigned_fetch_url
 from utils.extensions import db
@@ -40,8 +42,12 @@ def create_audio_log():  # put application's code here
     file_name = request.json["file_name"]
     audio_url = generate_presigned_fetch_url(file_name)
 
+    # generate a short-term token for AAI
+    token = create_access_token(identity=str(g.user_id), expires_delta=timedelta(hours=1))
     config = aai.TranscriptionConfig().set_webhook(
-        f"{os.getenv('API_URL')}/api/audio_logs/update_transcription"
+        f"{os.getenv('API_URL')}/api/audio_logs/update_transcription",
+        "Authorization",
+        f"Bearer {token}"
     )
     aai_result = aai.Transcriber().submit(audio_url, config)
     audio_log = AudioLog(
@@ -61,9 +67,10 @@ def update_transcription():  # put application's code here
     transcription_id = request.json["transcript_id"]
     aai_result = aai.Transcript.get_by_id(transcription_id)
 
-    # TODO: PASS AN AUTH HEADER TO ASSEMBLYAI & LOCK THIS ROUTE DOWN
-    # TODO: pass assemblyai our id directly. Validate that the transcription was a success.
     audio_log = AudioLog.query.filter_by(assemblyai_id=transcription_id).first()
+    if str(audio_log.user_id) != str(g.user_id):
+        return "permission denied", 403
+
     audio_log.text = aai_result.text
     db.session.commit()
 
