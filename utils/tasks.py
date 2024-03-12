@@ -1,7 +1,7 @@
 import json
 
 from models import Thing, AudioLog, Thought, Event, Category
-from schemas import ThingSchema
+from schemas import ThingListSchema
 from utils.extensions import db, celery
 from utils.inference import run_inference, ModelTypes
 from utils.prompts import VOID_BIG_BRAIN_PROMPT, VOID_SMOL_BRAIN_PROMPT
@@ -14,7 +14,7 @@ def run_shallow_analysis(log_id):
 
     try:
         raw_analysis = run_inference(ModelTypes.GPT4_TURBO.value, VOID_SMOL_BRAIN_PROMPT, json.dumps({
-            "things": ThingSchema(many=True).dump(all_things),
+            "things": ThingListSchema(many=True).dump(all_things),
             "text": audio_log.text
         }))
         audio_log.identified_things = raw_analysis["identified_things"]
@@ -34,7 +34,7 @@ def run_deep_analysis(log_id):
 
     try:
         raw_analysis = run_inference(ModelTypes.GPT4_TURBO.value, VOID_BIG_BRAIN_PROMPT, json.dumps({
-            "things": ThingSchema(many=True).dump(all_things),
+            "things": ThingListSchema(many=True).dump(all_things),
             "text": audio_log.text
         }))
         audio_log.raw_deep_analysis = raw_analysis
@@ -42,7 +42,7 @@ def run_deep_analysis(log_id):
 
         thoughts = []
         for thought in raw_analysis.get("thoughts", []):
-            thoughts.append(Thought(audio_log_id=audio_log.id, text=thought))
+            thoughts.append(Thought(audio_log_id=audio_log.id, text=thought, user_id=audio_log.user_id))
 
         events = []
         for event in raw_analysis.get("events", []):
@@ -61,6 +61,7 @@ def run_deep_analysis(log_id):
                     if suggested_thing_name not in thing_names:
                         thing = Thing(name=suggested_thing_name,
                                       unit=suggested_unit,
+                                      user_id=audio_log.user_id,
                                       category=suggested_category)
                         db.session.add(thing)
                         db.session.commit()
@@ -75,7 +76,8 @@ def run_deep_analysis(log_id):
                 events.append(Event(audio_log_id=audio_log.id,
                                     amount=event.get("amount"),
                                     note=event.get("note"),
-                                    thing_id=thing.id
+                                    thing_id=thing.id,
+                                    user_id=audio_log.user_id
                                     )
                               )
 
