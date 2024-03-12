@@ -5,6 +5,7 @@ from models import Thing, Event, Thought, AudioLog, User
 
 # TODO: Exclude sensitive fields from serialization
 
+
 class EventSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
@@ -20,6 +21,7 @@ class ThingListSchema(ma.SQLAlchemyAutoSchema):
 
 class ThingSchema(ma.SQLAlchemyAutoSchema):
     events = ma.Nested(EventSchema, many=True)
+
     class Meta:
         model = Thing
         load_instance = True
@@ -37,7 +39,7 @@ class AudioLogSchema(ma.SQLAlchemyAutoSchema):
     events = ma.Nested(EventSchema, many=True)
     thoughts = ma.Nested(ThoughtsSchema, many=True)
 
-    audio_uri = ma.Method('get_audio_uri')
+    audio_uri = ma.Method("get_audio_uri")
 
     def get_audio_uri(self, obj):
         return generate_presigned_fetch_url(obj.file_name)
@@ -45,8 +47,19 @@ class AudioLogSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = AudioLog
         load_instance = True
-        fields = ('id', 'created_at', 'status', 'file_name', 'is_processing_complete',
-                  'updated_at', 'text', 'identified_things', 'events', 'thoughts', 'audio_uri')
+        fields = (
+            "id",
+            "created_at",
+            "status",
+            "file_name",
+            "is_processing_complete",
+            "updated_at",
+            "text",
+            "identified_things",
+            "events",
+            "thoughts",
+            "audio_uri",
+        )
 
 
 class AudioLogListSchema(ma.SQLAlchemyAutoSchema):
@@ -54,8 +67,16 @@ class AudioLogListSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = AudioLog
         load_instance = True
-        fields = ('id', 'created_at', 'status', 'file_name', 'is_processing_complete',
-                  'updated_at', 'text', 'identified_things')
+        fields = (
+            "id",
+            "created_at",
+            "status",
+            "file_name",
+            "is_processing_complete",
+            "updated_at",
+            "text",
+            "identified_things",
+        )
 
 
 class UserSchema(ma.SQLAlchemyAutoSchema):
@@ -63,4 +84,4 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         model = User
         # include_fk = True
         load_instance = True
-        fields = ('id', 'email')
+        fields = ("id", "email")

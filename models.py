@@ -1,6 +1,16 @@
 from flask import g, abort
 from flask_sqlalchemy.query import Query
-from sqlalchemy import Column, DateTime, String, Integer, func, Text, ForeignKey, JSON, Boolean
+from sqlalchemy import (
+    Column,
+    DateTime,
+    String,
+    Integer,
+    func,
+    Text,
+    ForeignKey,
+    JSON,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 from enum import Enum
 from sqlalchemy.dialects.postgresql import UUID
@@ -17,37 +27,41 @@ class ExtendedEnum(Enum):
 
 
 class Category(ExtendedEnum):
-    Other = 'Other'
-    Health = 'Health'
-    Exercise = 'Exercise'
-    Mood = 'Mood'
+    Other = "Other"
+    Health = "Health"
+    Exercise = "Exercise"
+    Mood = "Mood"
 
 
 class ThingStatus(ExtendedEnum):
-    SUGGESTED = 'SUGGESTED'
-    APPROVED = 'APPROVED'
-    REJECTED = 'REJECTED'
+    SUGGESTED = "SUGGESTED"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
 
 
 class AudioLogStatus(ExtendedEnum):
-    PENDING_APPROVAL = 'PENDING_APPROVAL'
-    APPROVED = 'APPROVED'
-    REJECTED = 'REJECTED'
+    PENDING_APPROVAL = "PENDING_APPROVAL"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
 
 
 class TimestampedModel(db.Model):
     __abstract__ = True
-    created_at = Column(DateTime, default=func.timezone('UTC', func.now()))
-    updated_at = Column(DateTime, default=func.timezone('UTC', func.now()), onupdate=func.timezone('UTC', func.now()))
+    created_at = Column(DateTime, default=func.timezone("UTC", func.now()))
+    updated_at = Column(
+        DateTime,
+        default=func.timezone("UTC", func.now()),
+        onupdate=func.timezone("UTC", func.now()),
+    )
 
 
 class TimestampedUserModel(TimestampedModel):
     __abstract__ = True
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
     @classmethod
     def get_or_404(cls, id):
-        current_user_id = g.get('user_id', None)
+        current_user_id = g.get("user_id", None)
         obj = cls.query.get_or_404(id)
         if current_user_id is None or str(obj.user_id) != str(current_user_id):
             abort(404, description="Resource not found or not owned.")
@@ -56,20 +70,26 @@ class TimestampedUserModel(TimestampedModel):
 
     @classmethod
     def all(cls):
-        current_user_id = g.get('user_id', None)
-        return cls.query.filter_by(user_id=current_user_id).all() if current_user_id else []
+        current_user_id = g.get("user_id", None)
+        return (
+            cls.query.filter_by(user_id=current_user_id).all()
+            if current_user_id
+            else []
+        )
 
 
 class User(TimestampedModel):
-    __tablename__ = 'users'
+    __tablename__ = "users"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = db.Column(db.String(256), unique=True, nullable=False)
     password = db.Column(db.String(512))
 
-    events = relationship('Event', back_populates='user', cascade="all, delete-orphan")
-    thoughts = relationship('Thought', back_populates='user', cascade="all, delete-orphan")
-    logs = relationship('AudioLog', back_populates='user', cascade="all, delete-orphan")
-    things = relationship('Thing', back_populates='user', cascade="all, delete-orphan")
+    events = relationship("Event", back_populates="user", cascade="all, delete-orphan")
+    thoughts = relationship(
+        "Thought", back_populates="user", cascade="all, delete-orphan"
+    )
+    logs = relationship("AudioLog", back_populates="user", cascade="all, delete-orphan")
+    things = relationship("Thing", back_populates="user", cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -79,7 +99,7 @@ class User(TimestampedModel):
 
 
 class AudioLog(TimestampedUserModel):
-    __tablename__ = 'audio_logs'
+    __tablename__ = "audio_logs"
     id = Column(Integer, primary_key=True)
     assemblyai_id = Column(Text)
 
@@ -95,10 +115,14 @@ class AudioLog(TimestampedUserModel):
     raw_deep_analysis = Column(JSON)
     system_notes = Column(Text, default="")  # used to store issues w/ processing
 
-    events = relationship('Event', back_populates='audio_log', cascade="all, delete-orphan")
-    thoughts = relationship('Thought', back_populates='audio_log', cascade="all, delete-orphan")
+    events = relationship(
+        "Event", back_populates="audio_log", cascade="all, delete-orphan"
+    )
+    thoughts = relationship(
+        "Thought", back_populates="audio_log", cascade="all, delete-orphan"
+    )
 
-    user = relationship('User', back_populates='logs')
+    user = relationship("User", back_populates="logs")
 
 
 class Thing(TimestampedUserModel):
@@ -111,31 +135,33 @@ class Thing(TimestampedUserModel):
 
     status = Column(String, default=ThingStatus.SUGGESTED.value)
 
-    events = relationship('Event', back_populates='thing')
+    events = relationship("Event", back_populates="thing")
 
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'))
-    user = relationship('User', back_populates='things')
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    user = relationship("User", back_populates="things")
 
     def __repr__(self):
         return f"id: {self.id}, name: {self.name}"
 
 
 class Event(TimestampedUserModel):
-    __tablename__ = 'events'
+    __tablename__ = "events"
     id = Column(Integer, primary_key=True)
     amount = Column(String(64))
     note = Column(Text)
     is_active = Column(Boolean, default=False)  # inactive until confirmed by user
 
-    occurred_at = Column(DateTime, default=func.timezone('UTC', func.timezone('UTC', func.now())))
+    occurred_at = Column(
+        DateTime, default=func.timezone("UTC", func.timezone("UTC", func.now()))
+    )
 
-    audio_log = relationship('AudioLog', back_populates='events')
-    audio_log_id = Column(Integer, ForeignKey('audio_logs.id'))
+    audio_log = relationship("AudioLog", back_populates="events")
+    audio_log_id = Column(Integer, ForeignKey("audio_logs.id"))
 
-    thing = relationship('Thing', back_populates='events')
-    thing_id = Column(Integer, ForeignKey('things.id'))
+    thing = relationship("Thing", back_populates="events")
+    thing_id = Column(Integer, ForeignKey("things.id"))
 
-    user = relationship('User', back_populates='events')
+    user = relationship("User", back_populates="events")
 
 
 class Thought(TimestampedUserModel):
@@ -143,12 +169,12 @@ class Thought(TimestampedUserModel):
 
     id = db.Column(db.Integer, primary_key=True)
     text = Column(Text)
-    is_active = Column(Boolean, default=False) # inactive until confirmed by user
+    is_active = Column(Boolean, default=False)  # inactive until confirmed by user
 
-    audio_log = relationship('AudioLog', back_populates='thoughts')
-    audio_log_id = Column(Integer, ForeignKey('audio_logs.id'))
+    audio_log = relationship("AudioLog", back_populates="thoughts")
+    audio_log_id = Column(Integer, ForeignKey("audio_logs.id"))
 
-    user = relationship('User', back_populates='thoughts')
+    user = relationship("User", back_populates="thoughts")
 
     def __repr__(self):
         return f"id: {self.id}, text: {self.text}"

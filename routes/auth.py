@@ -8,14 +8,14 @@ from utils.extensions import db
 
 
 load_dotenv()
-auth_bp = Blueprint('auth_bp', __name__)
+auth_bp = Blueprint("auth_bp", __name__)
 
 
 # Create
-@auth_bp.route('/register', methods=['POST'])
+@auth_bp.route("/register", methods=["POST"])
 def register():
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
 
     if not email or not password:
         return jsonify({"msg": "Username and password required"}), 400
@@ -33,10 +33,10 @@ def register():
     return jsonify(access_token=access_token)
 
 
-@auth_bp.route('/login', methods=['POST'])
+@auth_bp.route("/login", methods=["POST"])
 def login():
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
 
     user = User.query.filter_by(email=email.lower()).first()
     if user and user.check_password(password):
@@ -46,7 +46,7 @@ def login():
     return jsonify({"msg": "Bad username or password"}), 401
 
 
-@auth_bp.route('/protected', methods=['GET'])
+@auth_bp.route("/protected", methods=["GET"])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()

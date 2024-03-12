@@ -13,10 +13,16 @@ def run_shallow_analysis(log_id):
     all_things = Thing.query.all()
 
     try:
-        raw_analysis = run_inference(ModelTypes.GPT4_TURBO.value, VOID_SMOL_BRAIN_PROMPT, json.dumps({
-            "things": ThingListSchema(many=True).dump(all_things),
-            "text": audio_log.text
-        }))
+        raw_analysis = run_inference(
+            ModelTypes.GPT4_TURBO.value,
+            VOID_SMOL_BRAIN_PROMPT,
+            json.dumps(
+                {
+                    "things": ThingListSchema(many=True).dump(all_things),
+                    "text": audio_log.text,
+                }
+            ),
+        )
         audio_log.identified_things = raw_analysis["identified_things"]
     except Exception as ex:
         audio_log.system_notes += f"\nError parsing identified_things: {ex}"
@@ -33,16 +39,26 @@ def run_deep_analysis(log_id):
     thing_names = [thing.name for thing in all_things]
 
     try:
-        raw_analysis = run_inference(ModelTypes.GPT4_TURBO.value, VOID_BIG_BRAIN_PROMPT, json.dumps({
-            "things": ThingListSchema(many=True).dump(all_things),
-            "text": audio_log.text
-        }))
+        raw_analysis = run_inference(
+            ModelTypes.GPT4_TURBO.value,
+            VOID_BIG_BRAIN_PROMPT,
+            json.dumps(
+                {
+                    "things": ThingListSchema(many=True).dump(all_things),
+                    "text": audio_log.text,
+                }
+            ),
+        )
         audio_log.raw_deep_analysis = raw_analysis
         db.session.commit()
 
         thoughts = []
         for thought in raw_analysis.get("thoughts", []):
-            thoughts.append(Thought(audio_log_id=audio_log.id, text=thought, user_id=audio_log.user_id))
+            thoughts.append(
+                Thought(
+                    audio_log_id=audio_log.id, text=thought, user_id=audio_log.user_id
+                )
+            )
 
         events = []
         for event in raw_analysis.get("events", []):
@@ -59,10 +75,12 @@ def run_deep_analysis(log_id):
 
                 if suggested_thing_name:
                     if suggested_thing_name not in thing_names:
-                        thing = Thing(name=suggested_thing_name,
-                                      unit=suggested_unit,
-                                      user_id=audio_log.user_id,
-                                      category=suggested_category)
+                        thing = Thing(
+                            name=suggested_thing_name,
+                            unit=suggested_unit,
+                            user_id=audio_log.user_id,
+                            category=suggested_category,
+                        )
                         db.session.add(thing)
                         db.session.commit()
                     else:
@@ -73,13 +91,15 @@ def run_deep_analysis(log_id):
                     thing = Thing.query.get(thing_id)
             if thing:
                 # if processing for thing went wrong, ignore event
-                events.append(Event(audio_log_id=audio_log.id,
-                                    amount=event.get("amount"),
-                                    note=event.get("note"),
-                                    thing_id=thing.id,
-                                    user_id=audio_log.user_id
-                                    )
-                              )
+                events.append(
+                    Event(
+                        audio_log_id=audio_log.id,
+                        amount=event.get("amount"),
+                        note=event.get("note"),
+                        thing_id=thing.id,
+                        user_id=audio_log.user_id,
+                    )
+                )
 
             db.session.add_all(events + thoughts)
 

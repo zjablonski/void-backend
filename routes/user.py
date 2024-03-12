@@ -8,14 +8,16 @@ from utils.extensions import db
 
 
 load_dotenv()
-user_bp = Blueprint('user_bp', __name__)
+user_bp = Blueprint("user_bp", __name__)
+
 
 @user_bp.before_request
 @jwt_required()
 def require_jwt():
     g.user_id = get_jwt_identity()
 
-@user_bp.route('/', methods=['GET'])
+
+@user_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_user():
     current_user_id = get_jwt_identity()

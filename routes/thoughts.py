@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from utils.extensions import db
 
 load_dotenv()
-thoughts_bp = Blueprint('thought_bp', __name__)
+thoughts_bp = Blueprint("thought_bp", __name__)
 
 
 @thoughts_bp.before_request
@@ -17,7 +17,7 @@ def require_jwt():
 
 
 # Create
-@thoughts_bp.route('/', methods=['POST'])
+@thoughts_bp.route("/", methods=["POST"])
 def create_thought():
     thought = ThoughtsSchema().load(request.json)
     thought.is_active = True
@@ -29,7 +29,7 @@ def create_thought():
 
 
 # Update
-@thoughts_bp.route('/<int:thought_id>', methods=['PUT'])
+@thoughts_bp.route("/<int:thought_id>", methods=["PUT"])
 def update_thought(thought_id):
     thought = Thought.get_or_404(thought_id)
     thought = ThoughtsSchema().load(request.json, instance=thought)
@@ -38,10 +38,9 @@ def update_thought(thought_id):
 
 
 # Delete
-@thoughts_bp.route('/<int:thought_id>', methods=['DELETE'])
+@thoughts_bp.route("/<int:thought_id>", methods=["DELETE"])
 def delete_thought(thought_id):
     thought = Thought.get_or_404(thought_id)
     db.session.delete(thought)
     db.session.commit()
-    return '', 204
-
+    return "", 204

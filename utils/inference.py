@@ -32,11 +32,7 @@ def run_inference(model_version, system_message, user_message):
             },
         ],
         model=model_version,
-        response_format={ "type": "json_object" }
+        response_format={"type": "json_object"},
     )
     events = json.loads(chat_completion.choices[0].message.content)
     return events
-
-
-
-

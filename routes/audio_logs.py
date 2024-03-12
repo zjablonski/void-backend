@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 # Configuration
 load_dotenv()
-audio_log_bp = Blueprint('audio_log_bp', __name__)
+audio_log_bp = Blueprint("audio_log_bp", __name__)
 aai.settings.api_key = os.getenv("ASSEMBLYAI_API_KEY")
 
 
@@ -23,38 +23,42 @@ def require_jwt():
     g.user_id = get_jwt_identity()
 
 
-@audio_log_bp.route('/<int:log_id>', methods=['GET'])
+@audio_log_bp.route("/<int:log_id>", methods=["GET"])
 def get_audio_log(log_id):
     audio_log = AudioLog.get_or_404(log_id)
     return AudioLogSchema().dump(audio_log)
 
 
-@audio_log_bp.route('/', methods=['GET'])
+@audio_log_bp.route("/", methods=["GET"])
 def get_audio_logs():
     audio_log = AudioLog.all()
     return AudioLogListSchema().dump(audio_log, many=True)
 
 
-@audio_log_bp.route('/', methods=['POST'])
+@audio_log_bp.route("/", methods=["POST"])
 def create_audio_log():  # put application's code here
-    file_name = request.json['file_name']
+    file_name = request.json["file_name"]
     audio_url = generate_presigned_fetch_url(file_name)
 
-    config = aai.TranscriptionConfig().set_webhook(f"{os.getenv('API_URL')}/api/audio_logs/update_transcription")
+    config = aai.TranscriptionConfig().set_webhook(
+        f"{os.getenv('API_URL')}/api/audio_logs/update_transcription"
+    )
     aai_result = aai.Transcriber().submit(audio_url, config)
-    audio_log = AudioLog(file_name=file_name,
-                         status="processing",
-                         user_id=g.user_id,
-                         assemblyai_id=aai_result.id)
+    audio_log = AudioLog(
+        file_name=file_name,
+        status="processing",
+        user_id=g.user_id,
+        assemblyai_id=aai_result.id,
+    )
     db.session.add(audio_log)
     db.session.commit()
 
     return jsonify(AudioLogSchema().dump(audio_log)), 201
 
 
-@audio_log_bp.route('/update_transcription', methods=['POST'])
+@audio_log_bp.route("/update_transcription", methods=["POST"])
 def update_transcription():  # put application's code here
-    transcription_id = request.json['transcript_id']
+    transcription_id = request.json["transcript_id"]
     aai_result = aai.Transcript.get_by_id(transcription_id)
 
     # TODO: PASS AN AUTH HEADER TO ASSEMBLYAI & LOCK THIS ROUTE DOWN
@@ -70,7 +74,7 @@ def update_transcription():  # put application's code here
     return "Success", 200
 
 
-@audio_log_bp.route('/<int:log_id>/approve', methods=['POST'])
+@audio_log_bp.route("/<int:log_id>/approve", methods=["POST"])
 def approve_audio_log(log_id):
     audio_log = AudioLog.get_or_404(log_id)
     audio_log.status = AudioLogStatus.APPROVED.value
@@ -86,13 +90,13 @@ def approve_audio_log(log_id):
     return "Success", 200
 
 
-@audio_log_bp.route('/<int:log_id>/thoughts', methods=['GET'])
+@audio_log_bp.route("/<int:log_id>/thoughts", methods=["GET"])
 def get_audio_log_thoughts(log_id):
     audio_log = AudioLog.get_or_404(log_id)
     return ThoughtsSchema().dump(audio_log.thoughts, many=True)
 
 
-@audio_log_bp.route('/<int:log_id>/events', methods=['GET'])
+@audio_log_bp.route("/<int:log_id>/events", methods=["GET"])
 def get_audio_log_events(log_id):
     audio_log = AudioLog.get_or_404(log_id)
     return EventSchema().dump(audio_log.events, many=True)

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from utils.extensions import db
 
 load_dotenv()
-events_bp = Blueprint('events_bp', __name__)
+events_bp = Blueprint("events_bp", __name__)
 
 
 @events_bp.before_request
@@ -17,7 +17,7 @@ def require_jwt():
 
 
 # Create
-@events_bp.route('/', methods=['POST'])
+@events_bp.route("/", methods=["POST"])
 def create_event():
     event = EventSchema().load(request.json)
     event.is_active = True
@@ -28,7 +28,7 @@ def create_event():
 
 
 # Update
-@events_bp.route('/<int:event_id>', methods=['PUT'])
+@events_bp.route("/<int:event_id>", methods=["PUT"])
 def update_event(event_id):
     event = Event.get_or_404(event_id)
     event = EventSchema().load(request.json, instance=event)
@@ -37,10 +37,9 @@ def update_event(event_id):
 
 
 # Delete
-@events_bp.route('/<int:event_id>', methods=['DELETE'])
+@events_bp.route("/<int:event_id>", methods=["DELETE"])
 def delete_event(event_id):
     event = Event.get_or_404(event_id)
     db.session.delete(event)
     db.session.commit()
-    return '', 204
-
+    return "", 204
