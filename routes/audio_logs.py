@@ -8,8 +8,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_tok
 
 from utils.s3_utils import generate_presigned_fetch_url
 from utils.extensions import db
-from models import AudioLog, Thing, Thought, Event, AudioLogStatus
-from schemas import AudioLogSchema, EventSchema, ThoughtsSchema, AudioLogListSchema
+from db.models import AudioLog, AudioLogStatus
+from db.schemas import AudioLogSchema, EventSchema, ThoughtsSchema, AudioLogListSchema
 from utils.tasks import run_shallow_analysis, run_deep_analysis
 from dotenv import load_dotenv
 

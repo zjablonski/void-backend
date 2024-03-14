@@ -1,8 +1,8 @@
 from flask import request, Blueprint, g
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Thought
-from schemas import ThoughtsSchema
+from db.models import Thought
+from db.schemas import ThoughtsSchema
 from dotenv import load_dotenv
 from utils.extensions import db
 

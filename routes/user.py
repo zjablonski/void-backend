@@ -1,11 +1,9 @@
-from flask import request, Blueprint, jsonify, g
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask import Blueprint, g
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Thought, User
-from schemas import ThoughtsSchema, UserSchema
+from db.models import User
+from db.schemas import UserSchema
 from dotenv import load_dotenv
-from utils.extensions import db
-
 
 load_dotenv()
 user_bp = Blueprint("user_bp", __name__)

@@ -1,8 +1,8 @@
 from flask import request, Blueprint, g
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from models import Thought, Event
-from schemas import ThoughtsSchema, EventSchema
+from db.models import Event
+from db.schemas import EventSchema
 from dotenv import load_dotenv
 from utils.extensions import db
 

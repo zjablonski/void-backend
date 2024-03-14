@@ -1,0 +1,32 @@
+version: '3.8'
+
+x-base_service: &backend
+  build: .
+  depends_on:
+    - db
+    - redis
+  env_file:
+    - .env
+
+services:
+  flask:
+    <<: *backend
+    command: /bin/sh -c "python utils/wait_for_postgres.py && alembic upgrade head && flask run --host=0.0.0.0 --port=5003"
+    ports:
+      - "5003:5003"
+
+  celery_worker:
+    <<: *backend
+    command: /bin/sh -c "python utils/wait_for_postgres.py && celery -A app.celery worker --loglevel=info"
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+  db:
+    image: "postgres:alpine"
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
