@@ -42,33 +42,39 @@ def create_audio_log():  # put application's code here
     file_name = request.json["file_name"]
     audio_url = generate_presigned_fetch_url(file_name)
 
-    # generate a short-term token for AAI
-    token = create_access_token(identity=str(g.user_id), expires_delta=timedelta(hours=1))
-    config = aai.TranscriptionConfig().set_webhook(
-        f"{os.getenv('API_URL')}/api/audio_logs/update_transcription",
-        "Authorization",
-        f"Bearer {token}"
-    )
-    aai_result = aai.Transcriber().submit(audio_url, config)
+
     audio_log = AudioLog(
         file_name=file_name,
         status="processing",
         user_id=g.user_id,
-        assemblyai_id=aai_result.id,
     )
+    db.session.add(audio_log)
+    db.session.commit()
+
+    # generate a short-term token for AAI
+    token = create_access_token(identity=str(g.user_id), expires_delta=timedelta(hours=1))
+    config = aai.TranscriptionConfig().set_webhook(
+        f"{os.getenv('API_URL')}/api/audio_logs/{audio_log.id}/update_transcription",
+        "Authorization",
+        f"Bearer {token}"
+    )
+    aai_result = aai.Transcriber().submit(audio_url, config)
+
+    audio_log.assemblyai_id = aai_result.id
     db.session.add(audio_log)
     db.session.commit()
 
     return jsonify(AudioLogSchema().dump(audio_log)), 201
 
 
-@audio_log_bp.route("/update_transcription", methods=["POST"])
-def update_transcription():  # put application's code here
+@audio_log_bp.route("/<int:log_id>/update_transcription", methods=["POST"])
+def update_transcription(log_id):  # put application's code here
+    audio_log = AudioLog.get_or_404(log_id)
     transcription_id = request.json["transcript_id"]
     aai_result = aai.Transcript.get_by_id(transcription_id)
+    print("Here", aai_result.text)
 
-    audio_log = AudioLog.query.filter_by(assemblyai_id=transcription_id).first()
-    if str(audio_log.user_id) != str(g.user_id):
+    if audio_log.assemblyai_id != transcription_id:
         return "permission denied", 403
 
     audio_log.text = aai_result.text
@@ -77,6 +83,9 @@ def update_transcription():  # put application's code here
     if audio_log.text:
         run_deep_analysis.delay(audio_log.id)
         run_shallow_analysis.delay(audio_log.id)
+    else:
+        audio_log.is_processing_complete = True
+        db.session.commit()
 
     return "Success", 200
 

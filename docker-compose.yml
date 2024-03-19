@@ -11,9 +11,13 @@ x-base_service: &backend
 services:
   flask:
     <<: *backend
-    command: /bin/sh -c "python utils/wait_for_postgres.py && alembic upgrade head && flask run --host=0.0.0.0 --port=5003"
+    command: /bin/sh -c "python utils/wait_for_postgres.py && alembic upgrade head && flask run --debug --host=0.0.0.0 --port=5003"
     ports:
       - "5003:5003"
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    environment:
+      - PYTHONUNBUFFERED=1
 
   celery_worker:
     <<: *backend
