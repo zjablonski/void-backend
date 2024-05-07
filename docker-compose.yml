@@ -7,6 +7,8 @@ x-base_service: &backend
     - redis
   env_file:
     - .env
+  environment:
+    - PYTHONUNBUFFERED=1
 
 services:
   flask:
@@ -16,8 +18,6 @@ services:
       - "5003:5003"
     volumes:
       - .:/app  # Mount the current directory to /app in the container
-    environment:
-      - PYTHONUNBUFFERED=1
 
   celery_worker:
     <<: *backend

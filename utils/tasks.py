@@ -10,7 +10,8 @@ from utils.prompts import VOID_BIG_BRAIN_PROMPT, VOID_SMOL_BRAIN_PROMPT
 @celery.task
 def run_shallow_analysis(log_id):
     audio_log = AudioLog.query.get(log_id)
-    all_things = Thing.query.all()
+    user_id = str(audio_log.user_id)
+    all_things = Thing.query.filter_by(user_id=user_id).all()
 
     try:
         raw_analysis = run_inference(
@@ -34,7 +35,8 @@ def run_shallow_analysis(log_id):
 @celery.task
 def run_deep_analysis(log_id):
     audio_log = AudioLog.query.get(log_id)
-    all_things = Thing.query.all()
+    user_id = str(audio_log.user_id)
+    all_things = Thing.query.filter_by(user_id=user_id).all()
     thing_ids = [thing.id for thing in all_things]
     thing_names = [thing.name for thing in all_things]
 
@@ -78,13 +80,14 @@ def run_deep_analysis(log_id):
                         thing = Thing(
                             name=suggested_thing_name,
                             unit=suggested_unit,
-                            user_id=audio_log.user_id,
+                            user_id=user_id,
                             category=suggested_category,
                         )
                         db.session.add(thing)
                         db.session.commit()
                     else:
-                        thing = Thing.query.filter_by(name=suggested_thing_name).first()
+                        thing = Thing.query.filter_by(name=suggested_thing_name,
+                                                      user_id=user_id).first()
             else:
                 # Thing already exists
                 if thing_id in thing_ids:
