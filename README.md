@@ -16,7 +16,7 @@ This is a [Flask](https://flask.palletsprojects.com/en/1.1.x/) app that serves a
 - Python
 - Flask
 
-## 💁‍♀️ How to use
+## 💁♀️ How to use
 - make sure you have a .env file
 - Build containers `docker compose build`
 - Start containers `docker compose up`

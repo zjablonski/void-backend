@@ -38,7 +38,7 @@ def run_deep_analysis(log_id):
     user_id = str(audio_log.user_id)
     all_things = Thing.query.filter_by(user_id=user_id).all()
     thing_ids = [thing.id for thing in all_things]
-    thing_names = [thing.name for thing in all_things]
+    thing_names = [thing.name.lower().strip() for thing in all_things]
 
     try:
         raw_analysis = run_inference(
@@ -76,7 +76,7 @@ def run_deep_analysis(log_id):
                     suggested_category = Category.Other.value
 
                 if suggested_thing_name:
-                    if suggested_thing_name not in thing_names:
+                    if suggested_thing_name.lower().strip() not in thing_names:
                         thing = Thing(
                             name=suggested_thing_name,
                             unit=suggested_unit,
