@@ -1,8 +1,8 @@
-from enum import Enum
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
 import json
+import os
+from dotenv import load_dotenv
+from enum import Enum
+from openai import OpenAI
 
 load_dotenv()
 

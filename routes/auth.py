@@ -1,10 +1,9 @@
-from flask import request, Blueprint, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from dotenv import load_dotenv
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 from db.models import User
-from dotenv import load_dotenv
 from utils.extensions import db
-
 
 load_dotenv()
 auth_bp = Blueprint("auth_bp", __name__)

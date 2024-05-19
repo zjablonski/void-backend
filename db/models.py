@@ -1,21 +1,10 @@
-from flask import g, abort
-from flask_sqlalchemy.query import Query
-from sqlalchemy import (
-    Column,
-    DateTime,
-    String,
-    Integer,
-    func,
-    Text,
-    ForeignKey,
-    JSON,
-    Boolean,
-)
-from sqlalchemy.orm import relationship
-from enum import Enum
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
+from enum import Enum
+from flask import abort, g
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, JSON, String, Text, func)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from utils.extensions import db
 

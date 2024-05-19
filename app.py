@@ -1,17 +1,16 @@
-from flask import Flask, request, jsonify
 import os
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request
 
-from routes.auth import auth_bp
 from routes.audio_logs import audio_log_bp
+from routes.auth import auth_bp
+from routes.events import events_bp
 from routes.things import thing_bp
 from routes.thoughts import thoughts_bp
-from routes.events import events_bp
 from routes.user import user_bp
-from dotenv import load_dotenv
-
-from utils.s3_utils import generate_presigned_upload_url
 from utils.celery_utils import configure_celery
-from utils.extensions import db, ma, celery, jwt
+from utils.extensions import celery, db, jwt, ma
+from utils.s3_utils import generate_presigned_upload_url
 
 load_dotenv()
 

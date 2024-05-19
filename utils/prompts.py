@@ -32,7 +32,7 @@ Output:
 ```json
 
 "events": [
-  { "thing_id": 1, "amount": "180", "note": " For lunch, I had two pieces of chicken, which made up most of my protein intake." },
+  { "thing_id": 1, "amount": "180", "note": "For lunch, I had two pieces of chicken, which made up most of my protein intake." },
   { "thing_id": 2, "amount": "7.5", "note": "I woke up feeling quite refreshed after a 7.5-hour sleep." },
   { "thing_id": 3, "amount": "3", "note": "After breakfast, I went for a run and covered about 3 miles at a moderate pace." }
 ],

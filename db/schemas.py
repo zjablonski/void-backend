@@ -1,6 +1,6 @@
-from utils.s3_utils import generate_presigned_fetch_url
+from db.models import AudioLog, Event, Thing, Thought, User
 from utils.extensions import ma
-from db.models import Thing, Event, Thought, AudioLog, User
+from utils.s3_utils import generate_presigned_fetch_url
 
 
 # TODO: Exclude sensitive fields from serialization

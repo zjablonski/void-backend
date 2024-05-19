@@ -1,10 +1,12 @@
+import os
+import time
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
-import time
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
+
+
 def wait_for_postgres(database_url):
     engine = create_engine(database_url)
     retries = 5

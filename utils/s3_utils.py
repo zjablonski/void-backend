@@ -1,8 +1,10 @@
-from dotenv import load_dotenv
-import os
 import boto3
+import os
+from dotenv import load_dotenv
+
 
 load_dotenv()
+
 S3_BUCKET = os.getenv("S3_BUCKET")
 s3_client = boto3.client(
     "s3",

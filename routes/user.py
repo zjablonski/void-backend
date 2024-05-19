@@ -1,9 +1,9 @@
+from dotenv import load_dotenv
 from flask import Blueprint, g
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from db.models import User
 from db.schemas import UserSchema
-from dotenv import load_dotenv
 
 load_dotenv()
 user_bp = Blueprint("user_bp", __name__)

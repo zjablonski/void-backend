@@ -1,12 +1,10 @@
+from flask import g
 from flask_jwt_extended import JWTManager
-
-from utils.celery_utils import make_celery
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy as SQLAlchemyBase
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import Query, scoped_session, sessionmaker
 
-from flask import g
-from sqlalchemy.orm import Query
+from utils.celery_utils import make_celery
 
 
 class UserScopedQuery(Query):

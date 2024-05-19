@@ -1,9 +1,9 @@
 import json
 
-from db.models import Thing, AudioLog, Thought, Event, Category
+from db.models import AudioLog, Category, Event, Thing, Thought
 from db.schemas import ThingListSchema
-from utils.extensions import db, celery
-from utils.inference import run_inference, ModelTypes
+from utils.extensions import celery, db
+from utils.inference import ModelTypes, run_inference
 from utils.prompts import VOID_BIG_BRAIN_PROMPT, VOID_SMOL_BRAIN_PROMPT
 
 

@@ -1,10 +1,11 @@
-from flask import request, Blueprint, g
-from flask_jwt_extended import jwt_required, get_jwt_identity
-
-from db.models import Thing, ThingStatus, Category
-from db.schemas import ThingListSchema, ThingSchema
 from dotenv import load_dotenv
+from flask import Blueprint, g, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+
+from db.models import Category, Thing, ThingStatus
+from db.schemas import ThingListSchema, ThingSchema
 from utils.extensions import db
+
 
 load_dotenv()
 thing_bp = Blueprint("thing_bp", __name__)

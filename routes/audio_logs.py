@@ -1,17 +1,15 @@
-from datetime import timedelta
-
-from flask import Blueprint, jsonify, request, g
 import assemblyai as aai
 import os
-
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
-
-from utils.s3_utils import generate_presigned_fetch_url
-from utils.extensions import db
-from db.models import AudioLog, AudioLogStatus
-from db.schemas import AudioLogSchema, EventSchema, ThoughtsSchema, AudioLogListSchema
-from utils.tasks import run_shallow_analysis, run_deep_analysis
+from datetime import timedelta
 from dotenv import load_dotenv
+from flask import Blueprint, g, jsonify, request
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+
+from db.models import AudioLog, AudioLogStatus
+from db.schemas import AudioLogListSchema, AudioLogSchema, EventSchema, ThoughtsSchema
+from utils.extensions import db
+from utils.s3_utils import generate_presigned_fetch_url
+from utils.tasks import run_deep_analysis, run_shallow_analysis
 
 # Configuration
 load_dotenv()
@@ -38,10 +36,9 @@ def get_audio_logs():
 
 
 @audio_log_bp.route("/", methods=["POST"])
-def create_audio_log():  # put application's code here
+def create_audio_log():
     file_name = request.json["file_name"]
     audio_url = generate_presigned_fetch_url(file_name)
-
 
     audio_log = AudioLog(
         file_name=file_name,
