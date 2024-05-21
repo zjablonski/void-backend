@@ -21,4 +21,7 @@ def get_user():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
 
+    if not user:
+        return "", 401
+
     return UserSchema().dump(user), 200
