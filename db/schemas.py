@@ -63,7 +63,6 @@ class AudioLogSchema(ma.SQLAlchemyAutoSchema):
 
 
 class AudioLogListSchema(ma.SQLAlchemyAutoSchema):
-
     class Meta:
         model = AudioLog
         load_instance = True

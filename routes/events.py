@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from flask import Blueprint, g, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
+
 from db.models import Event
 from db.schemas import EventSchema
 from utils.extensions import db

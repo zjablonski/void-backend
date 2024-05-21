@@ -86,8 +86,9 @@ def run_deep_analysis(log_id):
                         db.session.add(thing)
                         db.session.commit()
                     else:
-                        thing = Thing.query.filter_by(name=suggested_thing_name,
-                                                      user_id=user_id).first()
+                        thing = Thing.query.filter_by(
+                            name=suggested_thing_name, user_id=user_id
+                        ).first()
             else:
                 # Thing already exists
                 if thing_id in thing_ids:

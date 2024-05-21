@@ -1,7 +1,17 @@
 import uuid
 from enum import Enum
 from flask import abort, g
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, JSON, String, Text, func)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    JSON,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash

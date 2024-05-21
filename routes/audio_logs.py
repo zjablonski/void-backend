@@ -49,11 +49,13 @@ def create_audio_log():
     db.session.commit()
 
     # generate a short-term token for AAI
-    token = create_access_token(identity=str(g.user_id), expires_delta=timedelta(hours=1))
+    token = create_access_token(
+        identity=str(g.user_id), expires_delta=timedelta(hours=1)
+    )
     config = aai.TranscriptionConfig().set_webhook(
         f"{os.getenv('API_URL')}/api/audio_logs/{audio_log.id}/update_transcription",
         "Authorization",
-        f"Bearer {token}"
+        f"Bearer {token}",
     )
     aai_result = aai.Transcriber().submit(audio_url, config)
 
