@@ -24,11 +24,11 @@ def run_shallow_analysis(log_id):
                 }
             ),
         )
+        audio_log.raw_shallow_analysis = raw_analysis
         audio_log.identified_things = raw_analysis["identified_things"]
     except Exception as ex:
         audio_log.system_notes += f"\nError parsing identified_things: {ex}"
 
-    audio_log.raw_shallow_analysis = raw_analysis
     db.session.commit()
 
 
@@ -51,6 +51,7 @@ def run_deep_analysis(log_id):
                 }
             ),
         )
+
         audio_log.raw_deep_analysis = raw_analysis
         db.session.commit()
 
@@ -61,6 +62,8 @@ def run_deep_analysis(log_id):
                     audio_log_id=audio_log.id, text=thought, user_id=audio_log.user_id
                 )
             )
+
+        db.session.add_all(thoughts)
 
         events = []
         for event in raw_analysis.get("events", []):
@@ -105,7 +108,7 @@ def run_deep_analysis(log_id):
                     )
                 )
 
-            db.session.add_all(events + thoughts)
+            db.session.add_all(events)
 
     except Exception as ex:
         audio_log.system_notes += f"\nError parsing events: {ex}"

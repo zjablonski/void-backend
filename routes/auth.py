@@ -37,6 +37,7 @@ def login():
     password = request.json.get("password", None)
 
     user = User.query.filter_by(email=email.lower()).first()
+
     if user and user.check_password(password):
         access_token = create_access_token(identity=str(user.id), expires_delta=False)
         return jsonify(access_token=access_token)

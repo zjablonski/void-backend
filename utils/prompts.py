@@ -37,7 +37,7 @@ Output:
   { "thing_id": 3, "amount": "3", "note": "After breakfast, I went for a run and covered about 3 miles at a moderate pace." }
 ],
 
-"thoughts": [ "I enjoyed looking at the beautiful flowers in my garden."]
+"thoughts": ["I enjoyed looking at the beautiful flowers in my garden."]
 }
 ```
 

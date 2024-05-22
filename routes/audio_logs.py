@@ -6,7 +6,7 @@ from flask import Blueprint, g, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 from db.models import AudioLog, AudioLogStatus
-from db.schemas import AudioLogListSchema, AudioLogSchema, EventSchema, ThoughtsSchema
+from db.schemas import AudioLogListSchema, AudioLogSchema, EventSchema, ThoughtSchema
 from utils.extensions import db
 from utils.s3_utils import generate_presigned_fetch_url
 from utils.tasks import run_deep_analysis, run_shallow_analysis
@@ -31,8 +31,8 @@ def get_audio_log(log_id):
 
 @audio_log_bp.route("/", methods=["GET"])
 def get_audio_logs():
-    audio_log = AudioLog.all()
-    return AudioLogListSchema().dump(audio_log, many=True)
+    audio_logs = AudioLog.all()
+    return AudioLogListSchema().dump(audio_logs, many=True)
 
 
 @audio_log_bp.route("/", methods=["POST"])
@@ -71,10 +71,10 @@ def update_transcription(log_id):  # put application's code here
     audio_log = AudioLog.get_or_404(log_id)
     transcription_id = request.json["transcript_id"]
     aai_result = aai.Transcript.get_by_id(transcription_id)
-    print("Here", aai_result.text)
+    print("Raw text:", aai_result.text)
 
     if audio_log.assemblyai_id != transcription_id:
-        return "permission denied", 403
+        return "Forbidden", 403
 
     audio_log.text = aai_result.text
     db.session.commit()
@@ -108,7 +108,7 @@ def approve_audio_log(log_id):
 @audio_log_bp.route("/<int:log_id>/thoughts", methods=["GET"])
 def get_audio_log_thoughts(log_id):
     audio_log = AudioLog.get_or_404(log_id)
-    return ThoughtsSchema().dump(audio_log.thoughts, many=True)
+    return ThoughtSchema().dump(audio_log.thoughts, many=True)
 
 
 @audio_log_bp.route("/<int:log_id>/events", methods=["GET"])

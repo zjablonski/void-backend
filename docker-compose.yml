@@ -1,3 +1,6 @@
+volumes:
+  db_data:
+
 x-base_service: &backend
   build: .
   depends_on:
@@ -7,19 +10,19 @@ x-base_service: &backend
     - .env
   environment:
     - PYTHONUNBUFFERED=1
+  volumes:
+    - .:/app
 
 services:
   flask:
     <<: *backend
-    command: /bin/sh -c "python utils/wait_for_postgres.py && alembic upgrade head && flask run --debug --host=0.0.0.0 --port=5003"
+    command: /bin/sh -c "alembic upgrade head && flask run --debug --host=0.0.0.0 --port=5003"
     ports:
       - "5003:5003"
-    volumes:
-      - .:/app  # Mount the current directory to /app in the container
 
   celery_worker:
     <<: *backend
-    command: /bin/sh -c "python utils/wait_for_postgres.py && celery -A app.celery worker --loglevel=info -c 2"
+    command: watchmedo auto-restart --pattern "*.py" --recursive -- celery -A app.celery worker -l info -c 2
 
   redis:
     image: "redis:alpine"
@@ -28,6 +31,8 @@ services:
 
   db:
     image: "postgres:alpine"
+    volumes:
+      - db_data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: password
     ports:

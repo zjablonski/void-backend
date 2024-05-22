@@ -3,7 +3,7 @@ from flask import Blueprint, g, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from db.models import Thought
-from db.schemas import ThoughtsSchema
+from db.schemas import ThoughtSchema
 from utils.extensions import db
 
 load_dotenv()
@@ -19,22 +19,22 @@ def require_jwt():
 # Create
 @thoughts_bp.route("/", methods=["POST"])
 def create_thought():
-    thought = ThoughtsSchema().load(request.json)
+    thought = ThoughtSchema().load(request.json)
     thought.is_active = True
     thought.user_id = g.user_id
 
     db.session.add(thought)
     db.session.commit()
-    return ThoughtsSchema().dump(thought), 201
+    return ThoughtSchema().dump(thought), 201
 
 
 # Update
 @thoughts_bp.route("/<int:thought_id>", methods=["PUT"])
 def update_thought(thought_id):
     thought = Thought.get_or_404(thought_id)
-    thought = ThoughtsSchema().load(request.json, instance=thought)
+    thought = ThoughtSchema().load(request.json, instance=thought)
     db.session.commit()
-    return ThoughtsSchema().dump(thought)
+    return ThoughtSchema().dump(thought)
 
 
 # Delete

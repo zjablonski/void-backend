@@ -27,7 +27,7 @@ class ThingSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
 
 
-class ThoughtsSchema(ma.SQLAlchemyAutoSchema):
+class ThoughtSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Thought
         include_fk = True
@@ -35,9 +35,8 @@ class ThoughtsSchema(ma.SQLAlchemyAutoSchema):
 
 
 class AudioLogSchema(ma.SQLAlchemyAutoSchema):
-
     events = ma.Nested(EventSchema, many=True)
-    thoughts = ma.Nested(ThoughtsSchema, many=True)
+    thoughts = ma.Nested(ThoughtSchema, many=True)
 
     audio_uri = ma.Method("get_audio_uri")
 
@@ -63,6 +62,10 @@ class AudioLogSchema(ma.SQLAlchemyAutoSchema):
 
 
 class AudioLogListSchema(ma.SQLAlchemyAutoSchema):
+    # TODO: these will be slow but it's fine for now, can denormalize later
+    events = ma.Nested(EventSchema, many=True)
+    thoughts = ma.Nested(ThoughtSchema, many=True)
+
     class Meta:
         model = AudioLog
         load_instance = True
@@ -75,6 +78,8 @@ class AudioLogListSchema(ma.SQLAlchemyAutoSchema):
             "updated_at",
             "text",
             "identified_things",
+            "events",
+            "thoughts",
         )
 
 

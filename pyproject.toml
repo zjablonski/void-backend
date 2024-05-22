@@ -15,12 +15,11 @@ Flask-SQLAlchemy = "3.1.1"
 gunicorn = "21.2.0"
 redis = "5.0.1"
 requests = "2.31.0"
-Werkzeug = "3.0.1"
+Werkzeug = { version = "3.0.1", extras=["watchdog"] }
 python-dotenv = "^1.0.1"
 marshmallow-sqlalchemy = "^1.0.0"
 openai = "^1.14.0"
 psycopg2-binary = "^2.9.9"
-
 
 [build-system]
 requires = ["poetry-core"]
