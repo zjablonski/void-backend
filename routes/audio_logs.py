@@ -66,8 +66,18 @@ def create_audio_log():
     return jsonify(AudioLogSchema().dump(audio_log)), 201
 
 
+@audio_log_bp.route("/<int:log_id>", methods=["DELETE"])
+def delete_audio_log(log_id):
+    # this can technically leave dangling Things if they aren't linked to any other logs (through events),
+    # since Things don't cascade delete, but that's probably fine for now
+    audio_log = AudioLog.get_or_404(log_id)
+    db.session.delete(audio_log)
+    db.session.commit()
+    return "", 204
+
+
 @audio_log_bp.route("/<int:log_id>/update_transcription", methods=["POST"])
-def update_transcription(log_id):  # put application's code here
+def update_transcription(log_id):
     audio_log = AudioLog.get_or_404(log_id)
     transcription_id = request.json["transcript_id"]
     aai_result = aai.Transcript.get_by_id(transcription_id)

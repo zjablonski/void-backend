@@ -17,7 +17,6 @@ def require_jwt():
     g.user_id = get_jwt_identity()
 
 
-# Create
 @thing_bp.route("/", methods=["POST"])
 def create_thing():
     thing = ThingListSchema().load(request.json)
@@ -30,21 +29,18 @@ def create_thing():
     return ThingListSchema().dump(thing), 201
 
 
-# Read - single item
 @thing_bp.route("/<int:thing_id>", methods=["GET"])
 def get_thing(thing_id):
     thing = Thing.get_or_404(thing_id)
     return ThingSchema().dump(thing)
 
 
-# Read - all items
 @thing_bp.route("/", methods=["GET"])
 def get_things():
     all_things = Thing.all()
     return ThingListSchema(many=True).dump(all_things)
 
 
-# Update
 @thing_bp.route("/<int:thing_id>", methods=["PUT"])
 def update_thing(thing_id):
     thing = Thing.get_or_404(thing_id)
@@ -53,7 +49,6 @@ def update_thing(thing_id):
     return ThingListSchema().dump(thing)
 
 
-# Delete
 @thing_bp.route("/<int:thing_id>", methods=["DELETE"])
 def delete_thing(thing_id):
     thing = Thing.get_or_404(thing_id)

@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 
@@ -31,9 +32,9 @@ app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(user_bp, url_prefix="/api/user")
 
 
-@app.route("/")
-def hello_world():  # put application's code here
-    return "Hello World"
+@app.route("/health")
+def health():
+    return "", 200
 
 
 @app.route("/api/generate_presigned_url", methods=["POST"])
